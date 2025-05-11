@@ -7,11 +7,13 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var speed = float64(300 / ebiten.TPS()) // pixels per second
+var speed = float64(300 / ebiten.TPS())        // pixels per second
+var rotSpeed = math.Pi / float64(ebiten.TPS()) // half way around per second (2 seconds for full rotation)
 
 type Player struct {
-	position Vector
 	sprite   *ebiten.Image
+	position Vector
+	rotation float64
 }
 
 func NewPlayer() *Player {
@@ -27,39 +29,54 @@ func NewPlayer() *Player {
 	}
 
 	return &Player{
-		position: pos,
 		sprite:   sprite,
+		position: pos,
 	}
 }
 
 func (p *Player) Update() {
-	var delta Vector
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		delta.Y += speed
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		delta.Y -= speed
-	}
 	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		delta.X -= speed
+		p.rotation -= rotSpeed
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		delta.X += speed
+		p.rotation += rotSpeed
 	}
+	// var delta Vector
+	// if ebiten.IsKeyPressed(ebiten.KeyDown) {
+	// 	delta.Y += speed
+	// }
+	// if ebiten.IsKeyPressed(ebiten.KeyUp) {
+	// 	delta.Y -= speed
+	// }
+	// if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+	// 	delta.X -= speed
+	// }
+	// if ebiten.IsKeyPressed(ebiten.KeyRight) {
+	// 	delta.X += speed
+	// }
 
-	if delta.X != 0 && delta.Y != 0 {
-		factor := speed / math.Sqrt(delta.X*delta.X+delta.Y*delta.Y)
-		delta.X *= factor
-		delta.Y *= factor
-	}
+	// if delta.X != 0 && delta.Y != 0 {
+	// 	factor := speed / math.Sqrt(delta.X*delta.X+delta.Y*delta.Y)
+	// 	delta.X *= factor
+	// 	delta.Y *= factor
+	// }
 
-	p.position.X += delta.X
-	p.position.Y += delta.Y
+	// p.position.X += delta.X
+	// p.position.Y += delta.Y
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
+	bounds := p.sprite.Bounds()
+	halfW := float64(bounds.Dx() / 2)
+	halfH := float64(bounds.Dy() / 2)
+
 	op := &ebiten.DrawImageOptions{}
+	op.GeoM.Translate(-halfW, -halfH)
+	op.GeoM.Rotate(p.rotation)
+	op.GeoM.Translate(halfW, halfH)
+
 	op.GeoM.Translate(p.position.X, p.position.Y)
+
 	screen.DrawImage(p.sprite, op)
 
 	// width := PlayerSprite.Bounds().Dx()

@@ -4,17 +4,19 @@ import (
 	"embed"
 	"image"
 	_ "image/png"
+	"io/fs"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 //go:embed *
-var fs embed.FS
+var assets embed.FS
 
 var PlayerSprite = mustLoadImage("images/playerShip1_blue.png")
+var AsteroidSprites = mustLoadImages("images/meteors/*.png")
 
 func mustLoadImage(name string) *ebiten.Image {
-	f, err := fs.Open(name)
+	f, err := assets.Open(name)
 	if err != nil {
 		panic(err)
 	}
@@ -26,4 +28,18 @@ func mustLoadImage(name string) *ebiten.Image {
 	}
 
 	return ebiten.NewImageFromImage(img)
+}
+
+func mustLoadImages(path string) []*ebiten.Image {
+	matches, err := fs.Glob(assets, path)
+	if err != nil {
+		panic(err)
+	}
+
+	images := make([]*ebiten.Image, len(matches))
+	for i, match := range matches {
+		images[i] = mustLoadImage(match)
+	}
+
+	return images
 }

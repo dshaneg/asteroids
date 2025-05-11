@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	// "github.com/hajimehoshi/ebiten/v2/colorm"
 )
@@ -8,43 +10,41 @@ import (
 const (
 	ScreenWidth  = 800
 	ScreenHeight = 600
+
+	asteroidSpawnTime = 1 * time.Second
 )
 
-type Vector struct {
-	X float64
-	Y float64
-}
-
 type Game struct {
-	player *Player
-	// attackTimer       *Timer
-	// attackActiveTimer *Timer
-	// attackMessage     string
+	player             *Player
+	asteroidSpawnTimer *Timer
+	asteroids          []*Asteroid
 }
 
 var cnt int = 0
 
 func (g *Game) Update() error {
-	// g.attackTimer.Update()
-	// if g.attackTimer.IsReady() {
-	// 	g.attackTimer.Reset()
-
-	// 	g.attackMessage = fmt.Sprintf("Attack %d!", cnt)
-	// 	cnt++
-	// 	g.attackActiveTimer.Reset()
-	// }
-	// if len(g.attackMessage) > 0 && g.attackActiveTimer.IsReady() {
-	// 	g.attackMessage = ""
-	// }
 	g.player.Update()
+
+	g.asteroidSpawnTimer.Update()
+	if g.asteroidSpawnTimer.IsReady() {
+		g.asteroidSpawnTimer.Reset()
+
+		g.asteroids = append(g.asteroids, NewAsteroid())
+	}
+
+	for _, a := range g.asteroids {
+		a.Update()
+	}
 
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
 	g.player.Draw(screen)
-	// colorm.DrawImage(screen, PlayerSprite, cm, op)
-	// ebitenutil.DebugPrint(screen, g.attackMessage)
+
+	for _, a := range g.asteroids {
+		a.Draw(screen)
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -53,9 +53,8 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 
 func main() {
 	g := &Game{
-		player: NewPlayer(),
-		// attackTimer:       NewTimer(5 * time.Second),
-		// attackActiveTimer: NewTimer(1 * time.Second),
+		player:             NewPlayer(),
+		asteroidSpawnTimer: NewTimer(asteroidSpawnTime),
 	}
 
 	err := ebiten.RunGame(g)
