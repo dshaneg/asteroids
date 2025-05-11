@@ -47,6 +47,16 @@ func (g *Game) Update() error {
 		b.Update()
 	}
 
+	for i, a := range g.asteroids {
+		for j, b := range g.bullets {
+			if a.Collider().Intersects(b.Collider()) {
+				// Remove the bullet and asteroid from their respective slices
+				g.bullets = append(g.bullets[:j], g.bullets[j+1:]...)
+				g.asteroids = append(g.asteroids[:i], g.asteroids[i+1:]...)
+			}
+		}
+	}
+
 	return nil
 }
 

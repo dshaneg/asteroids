@@ -84,3 +84,14 @@ func (a *Asteroid) Draw(screen *ebiten.Image) {
 
 	screen.DrawImage(a.sprite, op)
 }
+
+func (a *Asteroid) Collider() Rect {
+	bounds := a.sprite.Bounds()
+
+	return NewRect(
+		a.position.X,
+		a.position.Y,
+		float64(bounds.Dx()),
+		float64(bounds.Dy()),
+	)
+}
