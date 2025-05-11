@@ -2,6 +2,7 @@ package main
 
 import (
 	"math"
+	"time"
 
 	"github.com/dshaneg/asteroids/assets"
 	"github.com/hajimehoshi/ebiten/v2"
@@ -10,13 +11,25 @@ import (
 var speed = float64(300 / ebiten.TPS())        // pixels per second
 var rotSpeed = math.Pi / float64(ebiten.TPS()) // half way around per second (2 seconds for full rotation)
 
+const (
+	shotCooldown      = time.Millisecond * 500
+	bulletSpawnOffset = 50.0
+)
+
 type Player struct {
 	sprite   *ebiten.Image
 	position Vector
 	rotation float64
+
+	shootCooldown *Timer
+	bulletAdder   BulletAdder
 }
 
-func NewPlayer() *Player {
+type BulletAdder interface {
+	AddBullet(b *Bullet)
+}
+
+func NewPlayer(bulletAdder BulletAdder) *Player {
 	sprite := assets.PlayerSprite
 
 	bounds := sprite.Bounds()
@@ -29,8 +42,10 @@ func NewPlayer() *Player {
 	}
 
 	return &Player{
-		sprite:   sprite,
-		position: pos,
+		sprite:        sprite,
+		position:      pos,
+		shootCooldown: NewTimer(shotCooldown),
+		bulletAdder:   bulletAdder,
 	}
 }
 
@@ -41,28 +56,25 @@ func (p *Player) Update() {
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
 		p.rotation += rotSpeed
 	}
-	// var delta Vector
-	// if ebiten.IsKeyPressed(ebiten.KeyDown) {
-	// 	delta.Y += speed
-	// }
-	// if ebiten.IsKeyPressed(ebiten.KeyUp) {
-	// 	delta.Y -= speed
-	// }
-	// if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-	// 	delta.X -= speed
-	// }
-	// if ebiten.IsKeyPressed(ebiten.KeyRight) {
-	// 	delta.X += speed
-	// }
 
-	// if delta.X != 0 && delta.Y != 0 {
-	// 	factor := speed / math.Sqrt(delta.X*delta.X+delta.Y*delta.Y)
-	// 	delta.X *= factor
-	// 	delta.Y *= factor
-	// }
+	p.shootCooldown.Update()
+	if p.shootCooldown.IsReady() && ebiten.IsKeyPressed(ebiten.KeySpace) {
+		p.shootCooldown.Reset()
 
-	// p.position.X += delta.X
-	// p.position.Y += delta.Y
+		// bullet should come from the middle of the ship
+		bounds := p.sprite.Bounds()
+		halfW := float64(bounds.Dx() / 2)
+		halfH := float64(bounds.Dy() / 2)
+
+		spawnPos := Vector{
+			X: p.position.X + halfW + math.Sin(p.rotation)*bulletSpawnOffset,
+			Y: p.position.Y + halfH + math.Cos(p.rotation)*-bulletSpawnOffset,
+		}
+
+		bullet := NewBullet(spawnPos, p.rotation)
+
+		p.bulletAdder.AddBullet(bullet)
+	}
 }
 
 func (p *Player) Draw(screen *ebiten.Image) {
@@ -78,18 +90,4 @@ func (p *Player) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(p.position.X, p.position.Y)
 
 	screen.DrawImage(p.sprite, op)
-
-	// width := PlayerSprite.Bounds().Dx()
-	// height := PlayerSprite.Bounds().Dy()
-
-	// halfW := float64(width / 2)
-	// halfH := float64(height / 2)
-
-	// op.GeoM.Translate(-halfW, -halfH)
-	// op.GeoM.Rotate(45.0 * math.Pi / 180.0)
-	// op.GeoM.Translate(halfW, halfH)
-
-	// op := &colorm.DrawImageOptions{}
-	// cm := colorm.ColorM{}
-	// cm.Scale(1.0, 1.0, 1.0, 0.5)
 }
