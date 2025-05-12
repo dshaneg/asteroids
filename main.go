@@ -2,10 +2,13 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"os"
 	"time"
 
+	"github.com/dshaneg/asteroids/assets"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/text/v2"
 	// "github.com/hajimehoshi/ebiten/v2/colorm"
 )
 
@@ -21,6 +24,7 @@ type Game struct {
 	asteroidSpawnTimer *Timer
 	asteroids          []*Asteroid
 	bullets            []*Bullet
+	score              int
 }
 
 var cnt int = 0
@@ -50,6 +54,7 @@ func (g *Game) Update() error {
 	for i, a := range g.asteroids {
 		for j, b := range g.bullets {
 			if a.Collider().Intersects(b.Collider()) {
+				g.score++
 				// Remove the bullet and asteroid from their respective slices
 				g.bullets = append(g.bullets[:j], g.bullets[j+1:]...)
 				g.asteroids = append(g.asteroids[:i], g.asteroids[i+1:]...)
@@ -70,6 +75,17 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for _, b := range g.bullets {
 		b.Draw(screen)
 	}
+
+	score := fmt.Sprintf("%06d", g.score)
+	face := &text.GoTextFace{Source: assets.ScoreFont, Size: 48}
+	op := &text.DrawOptions{}
+	op.LayoutOptions = text.LayoutOptions{
+		PrimaryAlign:   text.AlignCenter,
+		SecondaryAlign: text.AlignStart,
+	}
+	op.GeoM.Translate(ScreenWidth/2, 0)
+	op.ColorScale.ScaleWithColor(color.White)
+	text.Draw(screen, score, face, op)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -77,13 +93,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Fprintln(os.Stdout, "Recovered from panic:", r)
-			os.Stdout.Sync()
-		}
-	}()
-
 	g := &Game{
 		asteroidSpawnTimer: NewTimer(asteroidSpawnTime),
 	}
