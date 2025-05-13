@@ -8,11 +8,10 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-var speed = float64(300 / ebiten.TPS())        // pixels per second
-var rotSpeed = math.Pi / float64(ebiten.TPS()) // half way around per second (2 seconds for full rotation)
+var speed = float64(300 / ebiten.TPS()) // pixels per second
 
 const (
-	shotCooldown      = time.Millisecond * 500
+	shotCooldown      = time.Millisecond * 75
 	bulletSpawnOffset = 50.0
 )
 
@@ -50,12 +49,10 @@ func NewPlayer(bulletAdder BulletAdder) *Player {
 }
 
 func (p *Player) Update() {
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		p.rotation -= rotSpeed
-	}
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		p.rotation += rotSpeed
-	}
+	mouseX, mouseY := ebiten.CursorPosition()
+	dx := float64(mouseX) - (p.position.X + float64(p.sprite.Bounds().Dx())/2)
+	dy := float64(mouseY) - (p.position.Y + float64(p.sprite.Bounds().Dy())/2)
+	p.rotation = math.Atan2(dy, dx) + math.Pi/2
 
 	p.shootCooldown.Update()
 	if p.shootCooldown.IsReady() && ebiten.IsKeyPressed(ebiten.KeySpace) {

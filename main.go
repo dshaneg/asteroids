@@ -8,15 +8,15 @@ import (
 
 	"github.com/dshaneg/asteroids/assets"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text/v2"
-	// "github.com/hajimehoshi/ebiten/v2/colorm"
 )
 
 const (
 	ScreenWidth  = 800
 	ScreenHeight = 600
 
-	asteroidSpawnTime = 1 * time.Second
+	asteroidSpawnTime = 10 * time.Second
 )
 
 type Game struct {
@@ -86,6 +86,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(ScreenWidth/2, 0)
 	op.ColorScale.ScaleWithColor(color.White)
 	text.Draw(screen, score, face, op)
+
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Asteroids: %v", len(g.asteroids)), 0, 0)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %.2f", ebiten.ActualTPS()), 0, 20)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("FPS: %.2f", ebiten.ActualFPS()), 0, 40)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
