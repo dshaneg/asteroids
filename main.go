@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	ScreenWidth  = 800
-	ScreenHeight = 600
+	ScreenWidth  = 1024
+	ScreenHeight = 768
 
 	asteroidSpawnTime = 10 * time.Second
 )
@@ -27,8 +27,6 @@ type Game struct {
 	score              int
 }
 
-var cnt int = 0
-
 func (g *Game) AddBullet(b *Bullet) {
 	g.bullets = append(g.bullets, b)
 }
@@ -36,12 +34,12 @@ func (g *Game) AddBullet(b *Bullet) {
 func (g *Game) Update() error {
 	g.player.Update()
 
-	g.asteroidSpawnTimer.Update()
-	if g.asteroidSpawnTimer.IsReady() {
-		g.asteroidSpawnTimer.Reset()
+	// g.asteroidSpawnTimer.Update()
+	// if g.asteroidSpawnTimer.IsReady() {
+	// 	g.asteroidSpawnTimer.Reset()
 
-		g.asteroids = append(g.asteroids, NewAsteroid())
-	}
+	// 	g.asteroids = append(g.asteroids, NewAsteroid())
+	// }
 
 	for _, a := range g.asteroids {
 		a.Update()
@@ -97,6 +95,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
+	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
+	ebiten.SetWindowSize(ScreenWidth, ScreenHeight)
+
 	g := &Game{
 		asteroidSpawnTimer: NewTimer(asteroidSpawnTime),
 	}

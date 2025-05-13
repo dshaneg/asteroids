@@ -15,6 +15,7 @@ import (
 var assets embed.FS
 
 var PlayerSprite = mustLoadImage("images/playerShip1_blue.png")
+var PlumeSprite = mustLoadImage("images/fire09.png")
 var AsteroidSprites = mustLoadImages("images/meteors/*.png")
 var LaserSprite = mustLoadImage("images/laserBlue12.png")
 var ScoreFont = mustLoadFont("font.ttf")
