@@ -15,9 +15,9 @@ import (
 var assets embed.FS
 
 var PlayerSprite = mustLoadImage("images/playerShip1_blue.png")
-var PlumeSprite = mustLoadImage("images/fire09.png")
+var PlumeSprite = mustLoadImage("images/fire10.png")
 var AsteroidSprites = mustLoadImages("images/meteors/*.png")
-var LaserSprite = mustLoadImage("images/laserBlue12.png")
+var LaserSprite = mustLoadImage("images/laserRed07.png")
 var ScoreFont = mustLoadFont("font.ttf")
 
 func mustLoadImage(name string) *ebiten.Image {

@@ -34,12 +34,12 @@ func (g *Game) AddBullet(b *Bullet) {
 func (g *Game) Update() error {
 	g.player.Update()
 
-	// g.asteroidSpawnTimer.Update()
-	// if g.asteroidSpawnTimer.IsReady() {
-	// 	g.asteroidSpawnTimer.Reset()
+	g.asteroidSpawnTimer.Update()
+	if g.asteroidSpawnTimer.IsReady() {
+		g.asteroidSpawnTimer.Reset()
 
-	// 	g.asteroids = append(g.asteroids, NewAsteroid())
-	// }
+		g.asteroids = append(g.asteroids, NewAsteroid())
+	}
 
 	for _, a := range g.asteroids {
 		a.Update()
@@ -64,14 +64,14 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	for _, b := range g.bullets {
+		b.Draw(screen)
+	}
+
 	g.player.Draw(screen)
 
 	for _, a := range g.asteroids {
 		a.Draw(screen)
-	}
-
-	for _, b := range g.bullets {
-		b.Draw(screen)
 	}
 
 	score := fmt.Sprintf("%06d", g.score)
@@ -86,8 +86,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	text.Draw(screen, score, face, op)
 
 	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Asteroids: %v", len(g.asteroids)), 0, 0)
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %.2f", ebiten.ActualTPS()), 0, 20)
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("FPS: %.2f", ebiten.ActualFPS()), 0, 40)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Bullets: %v", len(g.bullets)), 0, 20)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("TPS: %.2f", ebiten.ActualTPS()), 0, 40)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("FPS: %.2f", ebiten.ActualFPS()), 0, 60)
+	// ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Loc: %.2f", g.player.position), 0, 80)
+	// ebitenutil.DebugPrintAt(screen, fmt.Sprintf("Rot: %.2f", g.player.rotation), 0, 100)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {

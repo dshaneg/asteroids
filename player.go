@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	shotCooldown      time.Duration = time.Millisecond * 75
-	bulletSpawnOffset float64       = 50.0
+	shotCooldown      time.Duration = time.Millisecond * 100
+	bulletSpawnOffset float64       = 30.0
 	accelPerSec       float64       = 10
 	speedLimitPerSec  float64       = 400
 )
@@ -28,10 +28,8 @@ type Player struct {
 }
 
 type Plume struct {
-	sprite   *ebiten.Image
-	position Vector
-	rotation float64
-	visible  bool
+	sprite  *ebiten.Image
+	visible bool
 }
 
 type BulletAdder interface {
@@ -69,7 +67,7 @@ func (p *Player) Update() {
 	p.rotation = math.Atan2(dy, dx) + math.Pi/2
 
 	// set the speed of the ship
-	if ebiten.IsKeyPressed(ebiten.KeyW) {
+	if ebiten.IsKeyPressed(ebiten.KeyW) || ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
 		accel := accelPerSec / float64(ebiten.TPS())
 		speedLimit := speedLimitPerSec / float64(ebiten.TPS())
 
@@ -111,18 +109,8 @@ func (p *Player) Update() {
 		p.speedY = 0
 	}
 
-	if p.plume.visible {
-		p.plume.rotation = p.rotation
-		bounds := p.sprite.Bounds()
-		halfW := float64(bounds.Dx() / 2)
-
-		// offset the plume position based on the ship's rotation
-		p.plume.position.X = p.position.X + halfW - float64(p.plume.sprite.Bounds().Dx()/2)
-		p.plume.position.Y = p.position.Y + float64(p.sprite.Bounds().Dy())
-	}
-
 	p.shootCooldown.Update()
-	if p.shootCooldown.IsReady() && ebiten.IsKeyPressed(ebiten.KeySpace) {
+	if p.shootCooldown.IsReady() && (ebiten.IsKeyPressed(ebiten.KeySpace) || ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)) {
 		p.shootCooldown.Reset()
 
 		// bullet should come from the middle of the ship
@@ -158,16 +146,11 @@ func (p *Player) Draw(screen *ebiten.Image) {
 	if p.plume.visible {
 		plumeBounds := p.plume.sprite.Bounds()
 		halfPlumeW := float64(plumeBounds.Dx() / 2)
-		halfPlumeH := float64(plumeBounds.Dy() / 2)
+
 		plumeOp := &ebiten.DrawImageOptions{}
-		plumeOp.GeoM.Translate(-halfPlumeW, -halfPlumeH)
+		plumeOp.GeoM.Translate(-halfPlumeW, halfH)
 		plumeOp.GeoM.Rotate(p.rotation)
-		plumeOp.GeoM.Translate(halfPlumeW, halfPlumeH)
-		dX := halfW*math.Cos(p.rotation) + halfPlumeW*math.Cos(p.plume.rotation)
-		dY := halfH*math.Sin(p.rotation) + halfPlumeH*math.Sin(p.plume.rotation)
-		p.plume.position.X = p.position.X + dX
-		p.plume.position.Y = p.position.Y + dY
-		plumeOp.GeoM.Translate(p.plume.position.X, p.plume.position.Y)
+		plumeOp.GeoM.Translate(p.position.X+halfW, p.position.Y+halfH)
 		screen.DrawImage(p.plume.sprite, plumeOp)
 	}
 }
