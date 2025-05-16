@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/dshaneg/asteroids/assets"
+	"github.com/dshaneg/asteroids/system"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -44,8 +45,8 @@ func NewPlayer(bulletAdder BulletAdder) *Player {
 	halfH := float64(bounds.Dy() / 2)
 
 	pos := Vector{
-		X: (float64(ScreenWidth) / 2) - halfW,
-		Y: (float64(ScreenHeight) / 2) - halfH,
+		X: (float64(system.ScreenWidth) / 2) - halfW,
+		Y: (float64(system.ScreenHeight) / 2) - halfH,
 	}
 
 	return &Player{
@@ -97,15 +98,15 @@ func (p *Player) Update() {
 	if p.position.X < 0 {
 		p.position.X = 0
 		p.speedX = 0
-	} else if p.position.X > float64(ScreenWidth)-float64(p.sprite.Bounds().Dx()) {
-		p.position.X = float64(ScreenWidth) - float64(p.sprite.Bounds().Dx())
+	} else if p.position.X > float64(system.ScreenWidth)-float64(p.sprite.Bounds().Dx()) {
+		p.position.X = float64(system.ScreenWidth) - float64(p.sprite.Bounds().Dx())
 		p.speedX = 0
 	}
 	if p.position.Y < 0 {
 		p.position.Y = 0
 		p.speedY = 0
-	} else if p.position.Y > float64(ScreenHeight)-float64(p.sprite.Bounds().Dy()) {
-		p.position.Y = float64(ScreenHeight) - float64(p.sprite.Bounds().Dy())
+	} else if p.position.Y > float64(system.ScreenHeight)-float64(p.sprite.Bounds().Dy()) {
+		p.position.Y = float64(system.ScreenHeight) - float64(p.sprite.Bounds().Dy())
 		p.speedY = 0
 	}
 

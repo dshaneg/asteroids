@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/dshaneg/asteroids/assets"
+	"github.com/dshaneg/asteroids/system"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -24,14 +25,14 @@ type Asteroid struct {
 func NewAsteroid() *Asteroid {
 	// where the asteroid is headed
 	target := Vector{
-		X: ScreenWidth / 2,
-		Y: ScreenHeight / 2,
+		X: system.ScreenWidth / 2,
+		Y: system.ScreenHeight / 2,
 	}
 
 	// the distance from the center of the screen to where the asteroid will spawn
-	radius := ScreenWidth / 2.0
+	radius := system.ScreenWidth / 2.0
 
-	// pick a random angle - 2Pi is 350 degrees - so this returns 0 to 360
+	// pick a random angle - 2Pi is 360 degrees - so this returns 0 to 360
 	angle := rand.Float64() * 2 * math.Pi
 
 	// figure out the spawn position by moving radius pixels from the target at the chosen angle
