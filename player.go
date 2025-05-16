@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	shotCooldown      time.Duration = time.Millisecond * 100
+	shotCooldown      time.Duration = time.Millisecond * 200
 	bulletSpawnOffset float64       = 30.0
 	accelPerSec       float64       = 10
 	speedLimitPerSec  float64       = 400
