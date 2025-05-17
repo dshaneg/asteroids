@@ -21,9 +21,7 @@ type Player struct {
 	position Vector
 	rotation float64
 	speed    Vector
-	// speedX   float64
-	// speedY   float64
-	plume *Plume
+	plume    *Plume
 
 	shootCooldown *Timer
 	bulletAdder   BulletAdder
