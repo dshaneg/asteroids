@@ -16,7 +16,7 @@ const (
 
 type Asteroid struct {
 	position      Vector
-	movement      Vector
+	speed         Vector
 	rotation      float64
 	rotationSpeed float64
 	sprite        *ebiten.Image
@@ -61,7 +61,7 @@ func NewAsteroid() *Asteroid {
 
 	return &Asteroid{
 		position:      pos,
-		movement:      movement,
+		speed:         movement,
 		rotationSpeed: rotationSpeedMin + rand.Float64()*(rotationSpeedMax-rotationSpeedMin),
 		sprite:        sprite,
 	}
@@ -72,14 +72,14 @@ func (a *Asteroid) Update() {
 	w := float64(b.Dx())
 	h := float64(b.Dy())
 
-	a.position.X += a.movement.X
+	a.position.X += a.speed.X
 	if a.position.X < -w {
 		a.position.X = system.ScreenWidth
 	} else if a.position.X > system.ScreenWidth {
 		a.position.X = -w
 	}
 
-	a.position.Y += a.movement.Y
+	a.position.Y += a.speed.Y
 	if a.position.Y < -h {
 		a.position.Y = system.ScreenHeight
 	} else if a.position.Y > system.ScreenHeight {

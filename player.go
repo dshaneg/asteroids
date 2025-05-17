@@ -20,9 +20,10 @@ type Player struct {
 	sprite   *ebiten.Image
 	position Vector
 	rotation float64
-	speedX   float64
-	speedY   float64
-	plume    *Plume
+	speed    Vector
+	// speedX   float64
+	// speedY   float64
+	plume *Plume
 
 	shootCooldown *Timer
 	bulletAdder   BulletAdder
@@ -72,42 +73,42 @@ func (p *Player) Update() {
 		accel := accelPerSec / float64(ebiten.TPS())
 		speedLimit := speedLimitPerSec / float64(ebiten.TPS())
 
-		p.speedX += math.Sin(p.rotation) * accel
-		if p.speedX > speedLimit {
-			p.speedX = speedLimit
-		} else if p.speedX < -speedLimit {
-			p.speedX = -speedLimit
+		p.speed.X += math.Sin(p.rotation) * accel
+		if p.speed.X > speedLimit {
+			p.speed.X = speedLimit
+		} else if p.speed.X < -speedLimit {
+			p.speed.X = -speedLimit
 		}
-		p.speedY += math.Cos(p.rotation) * -accel
-		if p.speedY > speedLimit {
-			p.speedY = speedLimit
-		} else if p.speedY < -speedLimit {
-			p.speedY = -speedLimit
+		p.speed.Y += math.Cos(p.rotation) * -accel
+		if p.speed.Y > speedLimit {
+			p.speed.Y = speedLimit
+		} else if p.speed.Y < -speedLimit {
+			p.speed.Y = -speedLimit
 		}
 		p.plume.visible = true
 	} else {
 		// auto decelerate
-		p.speedX *= 0.95
-		p.speedY *= 0.95
+		p.speed.X *= 0.95
+		p.speed.Y *= 0.95
 		p.plume.visible = false
 	}
 
 	// set the position of the ship
-	p.position.X += p.speedX
-	p.position.Y += p.speedY
+	p.position.X += p.speed.X
+	p.position.Y += p.speed.Y
 	if p.position.X < 0 {
 		p.position.X = 0
-		p.speedX = 0
+		p.speed.X = 0
 	} else if p.position.X > float64(system.ScreenWidth)-float64(p.sprite.Bounds().Dx()) {
 		p.position.X = float64(system.ScreenWidth) - float64(p.sprite.Bounds().Dx())
-		p.speedX = 0
+		p.speed.X = 0
 	}
 	if p.position.Y < 0 {
 		p.position.Y = 0
-		p.speedY = 0
+		p.speed.Y = 0
 	} else if p.position.Y > float64(system.ScreenHeight)-float64(p.sprite.Bounds().Dy()) {
 		p.position.Y = float64(system.ScreenHeight) - float64(p.sprite.Bounds().Dy())
-		p.speedY = 0
+		p.speed.Y = 0
 	}
 
 	p.shootCooldown.Update()
