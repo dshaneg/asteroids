@@ -68,8 +68,24 @@ func NewAsteroid() *Asteroid {
 }
 
 func (a *Asteroid) Update() {
+	b := a.sprite.Bounds()
+	w := float64(b.Dx())
+	h := float64(b.Dy())
+
 	a.position.X += a.movement.X
+	if a.position.X < -w {
+		a.position.X = system.ScreenWidth
+	} else if a.position.X > system.ScreenWidth {
+		a.position.X = -w
+	}
+
 	a.position.Y += a.movement.Y
+	if a.position.Y < -h {
+		a.position.Y = system.ScreenHeight
+	} else if a.position.Y > system.ScreenHeight {
+		a.position.Y = -h
+	}
+
 	a.rotation += a.rotationSpeed
 }
 
