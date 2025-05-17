@@ -20,9 +20,14 @@ type Asteroid struct {
 	rotation      float64
 	rotationSpeed float64
 	sprite        *ebiten.Image
+	asteroidAdder AsteroidAdder
 }
 
-func NewAsteroid() *Asteroid {
+type AsteroidAdder interface {
+	AddAsteroid(a *Asteroid)
+}
+
+func NewAsteroid(adder AsteroidAdder) *Asteroid {
 	// where the asteroid is headed
 	target := Vector{
 		X: system.ScreenWidth / 2,
@@ -64,6 +69,7 @@ func NewAsteroid() *Asteroid {
 		speed:         movement,
 		rotationSpeed: rotationSpeedMin + rand.Float64()*(rotationSpeedMax-rotationSpeedMin),
 		sprite:        sprite,
+		asteroidAdder: adder,
 	}
 }
 

@@ -23,6 +23,10 @@ func (g *Game) AddBullet(b *Bullet) {
 	g.bullets = append(g.bullets, b)
 }
 
+func (g *Game) AddAsteroid(a *Asteroid) {
+	g.asteroids = append(g.asteroids, a)
+}
+
 func (g *Game) Update() error {
 	g.player.Update()
 
@@ -30,7 +34,7 @@ func (g *Game) Update() error {
 	if g.asteroidSpawnTimer.IsReady() {
 		g.asteroidSpawnTimer.Reset()
 
-		g.asteroids = append(g.asteroids, NewAsteroid())
+		g.asteroids = append(g.asteroids, NewAsteroid(g))
 	}
 
 	for _, a := range g.asteroids {
