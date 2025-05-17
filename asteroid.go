@@ -30,7 +30,7 @@ func NewAsteroid() *Asteroid {
 	}
 
 	// the distance from the center of the screen to where the asteroid will spawn
-	radius := system.ScreenWidth / 2.0
+	radius := system.ScreenWidth/2.0 + 150
 
 	// pick a random angle - 2Pi is 360 degrees - so this returns 0 to 360
 	angle := rand.Float64() * 2 * math.Pi
