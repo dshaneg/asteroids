@@ -4,6 +4,7 @@ import (
 	"math"
 
 	"github.com/dshaneg/asteroids/assets"
+	"github.com/dshaneg/asteroids/system"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -52,6 +53,17 @@ func (b *Bullet) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(b.position.X+halfW, b.position.Y+halfH)
 
 	screen.DrawImage(b.sprite, op)
+}
+
+func (b *Bullet) IsOffScreen() bool {
+	bounds := b.sprite.Bounds()
+	if b.position.X < -float64(bounds.Dx()) ||
+		b.position.X > float64(system.ScreenWidth) ||
+		b.position.Y < -float64(bounds.Dy()) ||
+		b.position.Y > float64(system.ScreenHeight) {
+		return true
+	}
+	return false
 }
 
 func (b *Bullet) Collider() Rect {

@@ -37,7 +37,11 @@ func (g *Game) Update() error {
 		a.Update()
 	}
 
-	for _, b := range g.bullets {
+	for i, b := range g.bullets {
+		if b.IsOffScreen() {
+			g.discardBullet(i)
+			continue
+		}
 		b.Update()
 	}
 
@@ -46,13 +50,20 @@ func (g *Game) Update() error {
 			if a.Collider().Intersects(b.Collider()) {
 				g.score++
 				// Remove the bullet and asteroid from their respective slices
-				g.bullets = append(g.bullets[:j], g.bullets[j+1:]...)
+				g.discardBullet(j)
 				g.asteroids = append(g.asteroids[:i], g.asteroids[i+1:]...)
 			}
 		}
 	}
 
 	return nil
+}
+
+func (g *Game) discardBullet(index int) {
+	if index < 0 || index >= len(g.bullets) {
+		return
+	}
+	g.bullets = append(g.bullets[:index], g.bullets[index+1:]...)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
