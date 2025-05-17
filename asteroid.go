@@ -57,7 +57,7 @@ func NewAsteroid() *Asteroid {
 		Y: normalizedDirection.Y * velocity,
 	}
 
-	sprite := assets.AsteroidSprites[rand.Intn(len(assets.AsteroidSprites))]
+	sprite := assets.AsteroidBigSprites[rand.Intn(len(assets.AsteroidBigSprites))]
 
 	return &Asteroid{
 		position:      pos,

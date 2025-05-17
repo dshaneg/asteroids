@@ -16,7 +16,10 @@ var assets embed.FS
 
 var PlayerSprite = mustLoadImage("images/playerShip1_blue.png")
 var PlumeSprite = mustLoadImage("images/fire10.png")
-var AsteroidSprites = mustLoadImages("images/meteors/*.png")
+var AsteroidBigSprites = mustLoadImages("images/meteors/*_big*.png")
+var AsteroidMedSprites = mustLoadImages("images/meteors/*_med*.png")
+var AsteroidSmallSprites = mustLoadImages("images/meteors/*_small*.png")
+var AsteroidTinySprites = mustLoadImages("images/meteors/*_tiny*.png")
 var LaserSprite = mustLoadImage("images/laserRed07.png")
 var ScoreFont = mustLoadFont("font.ttf")
 
