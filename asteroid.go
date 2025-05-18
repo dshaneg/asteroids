@@ -14,20 +14,33 @@ const (
 	rotationSpeedMax = 0.02
 )
 
+type asteroidClass int
+
+const (
+	asteroidClassBig asteroidClass = iota
+	asteroidClassMedium
+	asteroidClassSmall
+	asteroidClassTiny
+)
+
+type asteroidColor int
+
+const (
+	asteroidColorBrown asteroidColor = iota
+	asteroidColorGray
+)
+
 type Asteroid struct {
+	class         asteroidClass
+	color         asteroidColor
 	position      Vector
 	speed         Vector
 	rotation      float64
 	rotationSpeed float64
 	sprite        *ebiten.Image
-	asteroidAdder AsteroidAdder
 }
 
-type AsteroidAdder interface {
-	AddAsteroid(a *Asteroid)
-}
-
-func NewAsteroid(adder AsteroidAdder) *Asteroid {
+func NewAsteroid() *Asteroid {
 	// where the asteroid is headed
 	target := Vector{
 		X: system.ScreenWidth / 2,
@@ -62,15 +75,71 @@ func NewAsteroid(adder AsteroidAdder) *Asteroid {
 		Y: normalizedDirection.Y * velocity,
 	}
 
-	sprite := assets.AsteroidBigSprites[rand.Intn(len(assets.AsteroidBigSprites))]
-
+	class := asteroidClassBig
+	color := asteroidColor(rand.Intn(2))
 	return &Asteroid{
+		class:         class,
+		color:         color,
 		position:      pos,
 		speed:         movement,
 		rotationSpeed: rotationSpeedMin + rand.Float64()*(rotationSpeedMax-rotationSpeedMin),
-		sprite:        sprite,
-		asteroidAdder: adder,
+		sprite:        getAsteroidSprite(class, color),
 	}
+}
+
+func (a *Asteroid) newChildAsteroid() *Asteroid {
+	angle := rand.Float64() * 2 * math.Pi
+	velocity := 0.25 + rand.Float64()*1.5 // between 0.25 and 1.75
+
+	movement := Vector{
+		X: math.Cos(angle) * velocity,
+		Y: math.Sin(angle) * velocity,
+	}
+
+	class := a.class + 1
+
+	return &Asteroid{
+		class:         class,
+		color:         a.color,
+		position:      a.position,
+		speed:         movement,
+		rotationSpeed: rotationSpeedMin + rand.Float64()*(rotationSpeedMax-rotationSpeedMin),
+		sprite:        getAsteroidSprite(class, a.color),
+	}
+}
+
+func getAsteroidSprite(class asteroidClass, color asteroidColor) *ebiten.Image {
+	switch {
+	case class == asteroidClassTiny && color == asteroidColorBrown:
+		return assets.AsteroidTinyBrownSprites[rand.Intn(len(assets.AsteroidTinyBrownSprites))]
+	case class == asteroidClassTiny && color == asteroidColorGray:
+		return assets.AsteroidTinyGraySprites[rand.Intn(len(assets.AsteroidTinyGraySprites))]
+	case class == asteroidClassSmall && color == asteroidColorBrown:
+		return assets.AsteroidSmallBrownSprites[rand.Intn(len(assets.AsteroidSmallBrownSprites))]
+	case class == asteroidClassSmall && color == asteroidColorGray:
+		return assets.AsteroidSmallGraySprites[rand.Intn(len(assets.AsteroidSmallGraySprites))]
+	case class == asteroidClassMedium && color == asteroidColorBrown:
+		return assets.AsteroidMediumBrownSprites[rand.Intn(len(assets.AsteroidMediumBrownSprites))]
+	case class == asteroidClassMedium && color == asteroidColorGray:
+		return assets.AsteroidMediumGraySprites[rand.Intn(len(assets.AsteroidMediumGraySprites))]
+	case class == asteroidClassBig && color == asteroidColorBrown:
+		return assets.AsteroidBigBrownSprites[rand.Intn(len(assets.AsteroidBigBrownSprites))]
+	default:
+		return assets.AsteroidBigGraySprites[rand.Intn(len(assets.AsteroidBigGraySprites))]
+	}
+}
+
+func (a *Asteroid) Split() []*Asteroid {
+	if a.class == asteroidClassTiny {
+		return nil
+	}
+
+	splitCount := rand.Intn(3) + 2
+	children := make([]*Asteroid, splitCount)
+	for i := 0; i < splitCount; i++ {
+		children[i] = a.newChildAsteroid()
+	}
+	return children
 }
 
 func (a *Asteroid) Update() {

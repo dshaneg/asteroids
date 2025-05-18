@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	asteroidSpawnTime = 1 * time.Second
+	asteroidSpawnTime = 5 * time.Second
 )
 
 func main() {

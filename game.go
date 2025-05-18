@@ -34,7 +34,7 @@ func (g *Game) Update() error {
 	if g.asteroidSpawnTimer.IsReady() {
 		g.asteroidSpawnTimer.Reset()
 
-		g.asteroids = append(g.asteroids, NewAsteroid(g))
+		g.asteroids = append(g.asteroids, NewAsteroid())
 	}
 
 	for _, a := range g.asteroids {
@@ -49,17 +49,19 @@ func (g *Game) Update() error {
 		b.Update()
 	}
 
-	for i, a := range g.asteroids {
-		for j, b := range g.bullets {
+	for i := len(g.asteroids) - 1; i >= 0; i-- {
+		a := g.asteroids[i]
+		for j := len(g.bullets) - 1; j >= 0; j-- {
+			b := g.bullets[j]
 			if a.Collider().Intersects(b.Collider()) {
 				g.score++
 				// Remove the bullet and asteroid from their respective slices
 				g.discardBullet(j)
-				g.asteroids = append(g.asteroids[:i], g.asteroids[i+1:]...)
+				g.discardAsteroid(i)
+				g.asteroids = append(g.asteroids, a.Split()...)
 			}
 		}
 	}
-
 	return nil
 }
 
@@ -68,6 +70,13 @@ func (g *Game) discardBullet(index int) {
 		return
 	}
 	g.bullets = append(g.bullets[:index], g.bullets[index+1:]...)
+}
+
+func (g *Game) discardAsteroid(index int) {
+	if index < 0 || index >= len(g.asteroids) {
+		return
+	}
+	g.asteroids = append(g.asteroids[:index], g.asteroids[index+1:]...)
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {

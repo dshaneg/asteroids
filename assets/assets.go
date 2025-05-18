@@ -16,12 +16,18 @@ var assets embed.FS
 
 var PlayerSprite = mustLoadImage("images/playerShip1_blue.png")
 var PlumeSprite = mustLoadImage("images/fire10.png")
-var AsteroidBigSprites = mustLoadImages("images/meteors/*_big*.png")
-var AsteroidMedSprites = mustLoadImages("images/meteors/*_med*.png")
-var AsteroidSmallSprites = mustLoadImages("images/meteors/*_small*.png")
-var AsteroidTinySprites = mustLoadImages("images/meteors/*_tiny*.png")
 var LaserSprite = mustLoadImage("images/laserRed07.png")
 var ScoreFont = mustLoadFont("font.ttf")
+
+var AsteroidBigBrownSprites = mustLoadImages("images/meteors/*Brown_big*.png")
+var AsteroidMediumBrownSprites = mustLoadImages("images/meteors/*Brown_med*.png")
+var AsteroidSmallBrownSprites = mustLoadImages("images/meteors/*Brown_small*.png")
+var AsteroidTinyBrownSprites = mustLoadImages("images/meteors/*Brown_tiny*.png")
+
+var AsteroidBigGraySprites = mustLoadImages("images/meteors/*Grey_big*.png")
+var AsteroidMediumGraySprites = mustLoadImages("images/meteors/*Grey_med*.png")
+var AsteroidSmallGraySprites = mustLoadImages("images/meteors/*Grey_small*.png")
+var AsteroidTinyGraySprites = mustLoadImages("images/meteors/*Grey_tiny*.png")
 
 func mustLoadImage(name string) *ebiten.Image {
 	f, err := assets.Open(name)
