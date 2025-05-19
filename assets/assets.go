@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"embed"
 	"image"
-	_ "image/png"
 	"io/fs"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -28,6 +27,8 @@ var AsteroidBigGraySprites = mustLoadImages("images/meteors/*Grey_big*.png")
 var AsteroidMediumGraySprites = mustLoadImages("images/meteors/*Grey_med*.png")
 var AsteroidSmallGraySprites = mustLoadImages("images/meteors/*Grey_small*.png")
 var AsteroidTinyGraySprites = mustLoadImages("images/meteors/*Grey_tiny*.png")
+
+var BoomSprite = mustLoadImage("images/boom.png")
 
 func mustLoadImage(name string) *ebiten.Image {
 	f, err := assets.Open(name)

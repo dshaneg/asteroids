@@ -7,12 +7,20 @@ import (
 	"github.com/dshaneg/asteroids/assets"
 	"github.com/dshaneg/asteroids/system"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/colorm"
 )
 
 const (
 	rotationSpeedMin = -0.02
 	rotationSpeedMax = 0.02
 )
+
+var asteroidMaxHealth = map[asteroidClass]int{
+	asteroidClassBig:    15,
+	asteroidClassMedium: 7,
+	asteroidClassSmall:  3,
+	asteroidClassTiny:   1,
+}
 
 type asteroidClass int
 
@@ -38,6 +46,8 @@ type Asteroid struct {
 	rotation      float64
 	rotationSpeed float64
 	sprite        *ebiten.Image
+	health        int
+	hot           bool
 }
 
 func NewAsteroid() *Asteroid {
@@ -84,6 +94,7 @@ func NewAsteroid() *Asteroid {
 		speed:         movement,
 		rotationSpeed: rotationSpeedMin + rand.Float64()*(rotationSpeedMax-rotationSpeedMin),
 		sprite:        getAsteroidSprite(class, color),
+		health:        asteroidMaxHealth[class],
 	}
 }
 
@@ -105,6 +116,7 @@ func (a *Asteroid) newChildAsteroid() *Asteroid {
 		speed:         movement,
 		rotationSpeed: rotationSpeedMin + rand.Float64()*(rotationSpeedMax-rotationSpeedMin),
 		sprite:        getAsteroidSprite(class, a.color),
+		health:        asteroidMaxHealth[class],
 	}
 }
 
@@ -130,7 +142,8 @@ func getAsteroidSprite(class asteroidClass, color asteroidColor) *ebiten.Image {
 }
 
 func (a *Asteroid) Split() []*Asteroid {
-	if a.class == asteroidClassTiny {
+	// remove the check for small to get nuts quick
+	if a.class == asteroidClassTiny || a.class == asteroidClassSmall {
 		return nil
 	}
 
@@ -143,6 +156,8 @@ func (a *Asteroid) Split() []*Asteroid {
 }
 
 func (a *Asteroid) Update() {
+	a.hot = false
+
 	b := a.sprite.Bounds()
 	w := float64(b.Dx())
 	h := float64(b.Dy())
@@ -169,12 +184,22 @@ func (a *Asteroid) Draw(screen *ebiten.Image) {
 	halfW := float64(bounds.Dx() / 2)
 	halfH := float64(bounds.Dy() / 2)
 
-	op := &ebiten.DrawImageOptions{}
-	op.GeoM.Translate(-halfW, -halfH)
-	op.GeoM.Rotate(a.rotation)
-	op.GeoM.Translate(a.position.X+halfW, a.position.Y+halfH)
+	if a.hot {
+		op := &colorm.DrawImageOptions{}
+		op.GeoM.Translate(-halfW, -halfH)
+		op.GeoM.Rotate(a.rotation)
+		op.GeoM.Translate(a.position.X+halfW, a.position.Y+halfH)
+		cm := colorm.ColorM{}
+		cm.Translate(1.0, 0.0, 0.0, 0.0)
+		colorm.DrawImage(screen, a.sprite, cm, op)
+	} else {
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(-halfW, -halfH)
+		op.GeoM.Rotate(a.rotation)
+		op.GeoM.Translate(a.position.X+halfW, a.position.Y+halfH)
 
-	screen.DrawImage(a.sprite, op)
+		screen.DrawImage(a.sprite, op)
+	}
 }
 
 func (a *Asteroid) Collider() Rect {
@@ -186,4 +211,9 @@ func (a *Asteroid) Collider() Rect {
 		float64(bounds.Dx()),
 		float64(bounds.Dy()),
 	)
+}
+
+func (a *Asteroid) Hit() {
+	a.health--
+	a.hot = true
 }

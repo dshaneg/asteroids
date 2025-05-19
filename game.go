@@ -16,6 +16,7 @@ type Game struct {
 	asteroidSpawnTimer *Timer
 	asteroids          []*Asteroid
 	bullets            []*Bullet
+	booms              []*Boom
 	score              int
 }
 
@@ -49,16 +50,23 @@ func (g *Game) Update() error {
 		b.Update()
 	}
 
+	for _, boom := range g.booms {
+		boom.Update()
+	}
+
 	for i := len(g.asteroids) - 1; i >= 0; i-- {
 		a := g.asteroids[i]
 		for j := len(g.bullets) - 1; j >= 0; j-- {
 			b := g.bullets[j]
 			if a.Collider().Intersects(b.Collider()) {
 				g.score++
-				// Remove the bullet and asteroid from their respective slices
 				g.discardBullet(j)
-				g.discardAsteroid(i)
-				g.asteroids = append(g.asteroids, a.Split()...)
+				a.Hit()
+				if a.health <= 0 {
+					g.booms = append(g.booms, NewBoom(a))
+					g.discardAsteroid(i)
+					g.asteroids = append(g.asteroids, a.Split()...)
+				}
 			}
 		}
 	}
@@ -79,6 +87,13 @@ func (g *Game) discardAsteroid(index int) {
 	g.asteroids = append(g.asteroids[:index], g.asteroids[index+1:]...)
 }
 
+func (g *Game) discardBoom(index int) {
+	if index < 0 || index >= len(g.booms) {
+		return
+	}
+	g.booms = append(g.booms[:index], g.booms[index+1:]...)
+}
+
 func (g *Game) Draw(screen *ebiten.Image) {
 	for _, b := range g.bullets {
 		b.Draw(screen)
@@ -88,6 +103,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	for _, a := range g.asteroids {
 		a.Draw(screen)
+	}
+
+	for i, boom := range g.booms {
+		if boom.visibleTimer.IsReady() {
+			g.discardBoom(i)
+			continue
+		}
+		boom.Draw(screen)
 	}
 
 	score := fmt.Sprintf("%06d", g.score)
