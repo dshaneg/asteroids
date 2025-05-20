@@ -18,6 +18,8 @@ func main() {
 	ebiten.SetWindowResizingMode(ebiten.WindowResizingModeEnabled)
 	ebiten.SetWindowSize(system.ScreenWidth, system.ScreenHeight)
 
+	ebiten.SetCursorShape(ebiten.CursorShapeCrosshair)
+
 	g := &Game{
 		asteroidSpawnTimer: NewTimer(asteroidSpawnTime),
 	}
